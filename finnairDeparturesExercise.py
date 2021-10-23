@@ -90,12 +90,10 @@ async def main():
     print("Done.")
 
 
-asyncio.get_event_loop().run_until_complete(main())
+if __name__ == "__main__":
+    try:
+        asyncio.get_event_loop().run_until_complete(main())
+    except EOFError:
+        print("failed to run")
+        exit(1)
 
-# while True:
-#     try:
-#         # keyword = input('? ')
-#         asyncio.get_event_loop().run_until_complete(main())
-#     except EOFError:
-#         print('bye')
-#         break
