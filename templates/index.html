@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Talinn Airport Departures Search</title>
+</head>
+    <body>
+        <h2>Search for AIRLINE and/or DESTINATION departure information (in JSON form) in the boxes below.</h2>
+        <div>
+            <form id="send-form-airline" action="/departures/search" method="post">
+                <label for="airline"><b>Airline: </b></label>
+                <input id="airline" name="airline" type="text" placeholder="e.g. Finnair">
+                </br>
+                <button id="search-airline">Search Airline</button>
+            </form>
+            <form id="send-form-destination" action="/departures/search" method="post">
+                <label for="destination"><b>Destination: </b></label>
+                <input id="destination" name="destination" type="text" placeholder="e.g. Helsinki">
+                </br>
+                <button id="search-destination">Search Destination</button>
+            </form>
+            <br/>
+        </div>
+        <div>
+            <button>Get current JSON of all departures information</button>
+        </div>
+
+        <script>
+        </script>
+    </body>
+</html>
