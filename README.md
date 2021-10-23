@@ -5,22 +5,40 @@
 ## Install requirements
 This project contains a requirements fill which lists all dependencies for this project.
 
-Run `pip install -r /path/to/requirements.txt` in your virtual environment.
+Run 
+```
+pip install -r /path/to/requirements.txt
+``` 
+in your virtual environment.
 
-## Determining Finnair Departures
+
+
+## Finding Finnair Departures
 `finnairDeparturesExercise.py` is an application to determine departures by Finnair currently scheduled on Talinn 
 Airport's website.
 
 This application will export a ``finnairDepartures.json`` containing datetimes of all current Finnair departures 
 (as well as their flight numbers) in the app's working directory.
 
-Run by executing ``python finnairDeparturesExercise.py`` in your virtual environment.
+Run by executing 
+```
+python finnairDeparturesExercise.py
+``` 
+in your virtual environment.
 
-## Flask Server to Serve Flight Times and Dates JSON
+
+
+
+
+## Flask Server for Serving Departure Data
 For the bonus portion of this exercise, I created a small Flask server to serve JSON information similar in the 
 previous exercise, except it also allows for querying ``airline`` and ``destination`` information.
 
-Run by executing ``python app.py`` in your virtual environment.
+Run by executing 
+```
+flask run
+``` 
+in your virtual environment.
 
 Then navigate to the server ``http://127.0.0.1:5000`` and the index should be visible.
 
