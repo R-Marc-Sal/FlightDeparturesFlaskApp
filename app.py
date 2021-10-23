@@ -1,6 +1,5 @@
-from flask import Flask, request, jsonify, render_template, Blueprint
+from flask import Flask, request, jsonify, render_template, abort
 from pyppeteer import launch
-from enum import Enum
 
 # init
 app = Flask(__name__)
@@ -28,41 +27,39 @@ def cleanData(data):
 
 
 def departureDataToDict(flightData, filterAirline, filterDestination):
-    departureList = []
-    _DATE = None
-    _TIME = None
-    _DEST = None
-    _FLIGHTNO = None
-    _AIRLINE = None
-    _INFORMATION = None
+    try:
+        departureList = []
+        for flight in flightData[1:]:
+            if len(flight) == 1:
+                # This signifies a row containing the DATE
+                _DATE = flight[0]
+            else:
+                _TIME = flight[DepartureData.DATETIME]
+                _DEST = flight[DepartureData.DESTINATION]
+                _FLIGHTNO = flight[DepartureData.FLIGHTNO]
+                _AIRLINE = flight[DepartureData.AIRLINE]
+                _INFORMATION = flight[DepartureData.INFORMATION]
 
-    for flight in flightData[1:]:
-        if len(flight) == 1:
-            # This signifies a row containing the DATE
-            _DATE = flight[0]
-        else:
-            _TIME = flight[DepartureData.DATETIME]
-            _DEST = flight[DepartureData.DESTINATION]
-            _FLIGHTNO = flight[DepartureData.FLIGHTNO]
-            _AIRLINE = flight[DepartureData.AIRLINE]
-            _INFORMATION = flight[DepartureData.INFORMATION]
-            if filterAirline:
-                if _AIRLINE.lower().strip() != filterAirline.lower().strip():
-                    continue
-            if filterDestination:
-                if _DEST.lower().strip() != filterDestination.lower().strip():
-                    continue
-            entry = {
-                _DATE + ", " + _TIME: {
-                    "Airline": _AIRLINE,
-                    "Destination": _DEST,
-                    "Flight Number": _FLIGHTNO
-                }}
-            departureList.append(entry)
-    return departureList
+                if filterAirline:
+                    if _AIRLINE.lower().replace(" ", "") != filterAirline.lower().replace(" ", ""):
+                        continue
+                if filterDestination:
+                    if _DEST.lower().replace(" ", "") != filterDestination.lower().replace(" ", ""):
+                        continue
+
+                entry = {
+                    _DATE + ", " + _TIME: {
+                        "Airline": _AIRLINE,
+                        "Destination": _DEST,
+                        "Flight Number": _FLIGHTNO
+                    }}
+                departureList.append(entry)
+        return departureList
+    except ValueError:
+        abort(500)
 
 
-async def generateDeparturesJSON(filterAirline='', filterDestination=''):
+async def generateDeparturesJSON(filterAirline=None, filterDestination=None):
     # Create browser instance and navigate to website
     browser = await launch(
         handleSIGINT=False,
@@ -89,7 +86,15 @@ async def generateDeparturesJSON(filterAirline='', filterDestination=''):
     ''')
     cleaned = cleanData(data)
     departureDict = departureDataToDict(cleaned, filterAirline, filterDestination)
+    await browser.close()
     return departureDict
+
+
+def inputIsValid(query):
+    if query:
+        if len(query.replace(" ", "")) != 0:
+            return True
+    return False
 
 
 # Routes
@@ -103,45 +108,23 @@ async def departures():
     try:
         d = await generateDeparturesJSON()
         return jsonify(d)
-    except TimeoutError:
-        return 408
+    except ValueError:
+        abort(500)
 
 
-# @app.route("/departures/search")
-# async def search():
-#     # Gather optional arguments in search query
-#     airline = request.args.get("airline", None)
-#     destination = request.args.get("destination", None)
-#     try:
-#         d = await generateDeparturesJSON(filterAirline=airline, filterDestination=destination)
-#         # Calls jsonify automatically if Flask version > 1.1.0
-#         return jsonify(d)
-#     except TimeoutError:
-#         return 408
-
-
-def inputIsValid(searchQuery):
-    if searchQuery:
-        if len(searchQuery.strip()) != 0:
-            return True
-    return False
-
-
-@app.route("/departures/search", methods=["GET", "POST"])
+@app.route("/departures/search", methods=["GET"])
 async def search():
     # Gather optional arguments in search query
-    airline = request.values.get("airline")
-    airline = airline if inputIsValid(airline) else ''
-    destination = request.values.get("destination")
-    destination = destination if inputIsValid(destination) else ''
-
+    airline = request.args.get("airline", None)
+    airline = airline if inputIsValid(airline) else None
+    destination = request.args.get("destination", None)
+    destination = destination if inputIsValid(destination) else None
     try:
         d = await generateDeparturesJSON(filterAirline=airline, filterDestination=destination)
         # Calls jsonify automatically if Flask version > 1.1.0
         return jsonify(d)
-        #return destination
-    except TimeoutError:
-        return 408
+    except ValueError:
+        abort(404)
 
 
 if __name__ == "__main__":

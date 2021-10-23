@@ -23,7 +23,7 @@ def departureDataToDict(flightData, filterAirline=None):
             _INFORMATION = flight[4]
 
             if filterAirline:
-                if _AIRLINE.lower().strip() != filterAirline.lower().strip():
+                if _AIRLINE.lower().replace(" ", "") != filterAirline.lower().replace(" ", ""):
                     continue
             entry = {
                 _DATE + ", " + _TIME: {

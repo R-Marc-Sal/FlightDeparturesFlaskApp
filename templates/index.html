@@ -3,29 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <title>Talinn Airport Departures Search</title>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+
 </head>
     <body>
         <h2>Search for AIRLINE and/or DESTINATION departure information (in JSON form) in the boxes below.</h2>
+        <p>(Search will take a few seconds to complete)</p>
         <div>
-            <form id="send-form-airline" action="/departures/search" method="post">
+            <form id="send-form" action="/departures/search" method="get">
                 <label for="airline"><b>Airline: </b></label>
                 <input id="airline" name="airline" type="text" placeholder="e.g. Finnair">
                 </br>
-                <button id="search-airline">Search Airline</button>
-            </form>
-            <form id="send-form-destination" action="/departures/search" method="post">
                 <label for="destination"><b>Destination: </b></label>
                 <input id="destination" name="destination" type="text" placeholder="e.g. Helsinki">
                 </br>
-                <button id="search-destination">Search Destination</button>
+                <button id="search-button" onclick="$('#loading').show();">Search</button>
             </form>
             <br/>
         </div>
+        </br>
         <div>
-            <button>Get current JSON of all departures information</button>
+            <a href=departures><button onclick="$('#loading').show();">Get JSON of all current departures</button></a>
         </div>
-
-        <script>
-        </script>
+        </br>
+        <div id="loading" style="display:none;"><img src="static/animations/loading.gif" alt="" />Loading...</div>
     </body>
 </html>
